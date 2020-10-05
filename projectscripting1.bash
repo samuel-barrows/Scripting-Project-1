@@ -69,7 +69,7 @@ title(){
 
 #Number of packages installed
 numbered_packages(){
-    package_num=$(dpkg -l | wc -l)
+    package_num=$(dpkg -l | grep "ii" | wc -l)
     echo "Number of packages installed: <b>$package_num</b>"
 }
 
@@ -79,6 +79,13 @@ services(){
     service_list=$(for user in $users ; do echo "<br><b>$user</b><br>" ; ps -U $user -u $user | tr -s " " | cut -d " " -f 5 | grep -v "CMD" | while IFS= read -r line; do echo "$line<br>"; done; done)
     echo "Active services per <b>user</b>:<br><br> $service_list<br><br>"
 }
+
+#Check to make sure the script is being run as root
+if [[ $(whoami | id -u) -ne 0 ]]
+then
+    >&2 echo "This script must be run as root!"
+    exit;
+fi
 
 #The HTML page
 cat <<EOF
